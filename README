@@ -10,7 +10,7 @@ application.
 Included tests
 --------------
 
-The repository comes with two ready-to-use test cases:
+Currently the repository only contains two rather general test cases:
 
 1) 'cyclomatic_complexity' - reports excessive cyclomatic complexities in the
    project sources.
