@@ -36,53 +36,77 @@ with Ada.Strings.Unbounded;
 
 package body Generic_Command_Line_Processing is
 
-   ---------------------------------------------------------------------------
-   --  function To_String (private):
-   --
+   function To_String (Argument : in     Argument_Names) return String;
    --  Returns Argument as a string.
    --
    --  Exceptions:
    --    None
 
-   function To_String (Argument : in     Argument_Names) return String is
-
-      use Ada.Characters.Handling;
-
-   begin --  To_String
-      return Argument_Marker & To_Lower (Argument_Names'Image (Argument));
-   end To_String;
-
-   ---------------------------------------------------------------------------
-   --  function To_Argument (private):
-   --
+   function To_Argument (Item : in     String) return Argument_Names;
    --  Returns Item as a command line argument.
    --
    --  Exceptions:
    --    Constraint_Error - if Item isn't a valid command line argument.
 
-   function To_Argument (Item : in     String) return Argument_Names is
-
-      Trimmed_Name : constant String := Item (Item'First + 1 .. Item'Last);
-
-   begin --  To_Argument
-      return Argument_Names'Value (Trimmed_Name);
-   end To_Argument;
-
-   ---------------------------------------------------------------------------
-   --  function Is_An_Argument (private):
-   --
+   function Is_An_Argument (Item : in     String) return Boolean;
    --  Checks if Item is a valid command line argument.
    --
    --  Exceptions:
    --    None
 
+   procedure Process_Arguments;
+
+   ---------------------------------------------------------------------------
+
+   Argument_Index       : Command_Line_Types.Natural_Array := (others => 0);
+   --  0 means that the argument hasn't been found (yet).
+
+   Argument_Field_Count : Command_Line_Types.Natural_Array := (others => 0);
+   --  A field count of zero is equivalent to a flag.
+
+   ---------------------------------------------------------------------------
+
+   function All_Arguments_Valid return Boolean is
+      use Ada.Text_IO;
+      OK : Boolean := True;
+   begin
+      for Argument in Argument_Names loop
+         if Valid (Argument) then
+            null; --  OK!
+         else
+            if OK then
+               Put (File => Current_Error,
+                    Item => "Error. Problems with the command line " &
+                            "arguments: " & To_String (Argument));
+            else
+               Put (File => Current_Error,
+                    Item => ", " & To_String (Argument));
+            end if;
+
+            OK := False;
+         end if;
+      end loop;
+
+      if OK then
+         null; --  OK!
+      else
+         Put_Line (File => Current_Error,
+                   Item => ".");
+      end if;
+
+      return OK;
+   end All_Arguments_Valid;
+
+   function Field_Count (Argument : Argument_Names) return Natural is
+   begin
+      return Argument_Field_Count (Argument);
+   end Field_Count;
+
    function Is_An_Argument (Item : in     String) return Boolean is
-
       Trimmed_Name : constant String := Item (Item'First + 1 .. Item'Last);
-
-      Argument : Argument_Names;
-
-   begin --  Is_An_Argument
+      Argument     : Argument_Names;
+      pragma Unreferenced (Argument);
+   begin
       Argument := Argument_Names'Value (Trimmed_Name);
 
       return True;
@@ -97,33 +121,10 @@ package body Generic_Command_Line_Processing is
          raise;
    end Is_An_Argument;
 
-   ---------------------------------------------------------------------------
-   --  Argument information:
-
-   ---------------------------------------------------------------------
-   --  Argument_Index:
-   --
-   --  0 means that the argument hasn't been found (yet).
-
-   Argument_Index : Command_Line_Types.Natural_Array := (others => 0);
-
-   ---------------------------------------------------------------------
-   --  Argument_Field_Count:
-   --
-   --  A field count of zero is equivalent to a flag.
-
-   Argument_Field_Count : Command_Line_Types.Natural_Array := (others => 0);
-
-   ---------------------------------------------------------------------
-   --  procedure Process_Arguments (private):
-
    procedure Process_Arguments is
-
       use Ada.Command_Line;
-
       Current_Argument : Argument_Names;
-
-   begin --  Process_Arguments
+   begin
       for Index in 1 .. Argument_Count loop
          if Is_An_Argument (Argument (Index)) then
             Current_Argument := To_Argument (Argument (Index));
@@ -146,21 +147,11 @@ package body Generic_Command_Line_Processing is
       end loop;
    end Process_Arguments;
 
-   ---------------------------------------------------------------------------
-   --  procedure Put_Help:
-   --
-   --  Writes a help message to the file.
-   --
-   --  Exceptions:
-   --    Same as for Ada.Text_IO.Put_Line.
-
    procedure Put_Help (File : in     Ada.Text_IO.File_Type) is
-
       use Ada.Command_Line;
       use Ada.Integer_Text_IO;
       use Ada.Strings.Unbounded;
       use Ada.Text_IO;
-
    begin --  Put_Help
       Put_Line (File => File,
                 Item => "Command line arguments for '" & Command_Name & "':");
@@ -222,64 +213,25 @@ package body Generic_Command_Line_Processing is
       New_Line (File => File);
    end Put_Help;
 
-   ---------------------------------------------------------------------------
-   --  function All_Arguments_Valid:
-   --
-   --  Checks if all the command line arguments are valid (according to
-   --  Valid).
-   --
-   --  Exceptions:
-   --    None
+   function Set (Argument : Argument_Names) return Boolean is
+   begin
+      return Argument_Index (Argument) > 0;
+   end Set;
 
-   function All_Arguments_Valid return Boolean is
+   function To_Argument (Item : in     String) return Argument_Names is
+      Trimmed_Name : constant String := Item (Item'First + 1 .. Item'Last);
+   begin
+      return Argument_Names'Value (Trimmed_Name);
+   end To_Argument;
 
-      use Ada.Text_IO;
-
-      OK : Boolean := True;
-
-   begin --  All_Arguments_Valid
-      for Argument in Argument_Names loop
-         if Valid (Argument) then
-            null; --  OK!
-         else
-            if OK then
-               Put (File => Current_Error,
-                    Item => "Error. Problems with the command line " &
-                            "arguments: " & To_String (Argument));
-            else
-               Put (File => Current_Error,
-                    Item => ", " & To_String (Argument));
-            end if;
-
-            OK := False;
-         end if;
-      end loop;
-
-      if OK then
-         null; --  OK!
-      else
-         Put_Line (File => Current_Error,
-                   Item => ".");
-      end if;
-
-      return OK;
-   end All_Arguments_Valid;
-
-   ---------------------------------------------------------------------------
-   --  function Valid:
-   --
-   --  Checks if Argument is valid (according to Obligatory,
-   --  Minimum_Field_Count, and Maximum_Field_Count).
-   --
-   --  Exceptions:
-   --    None
+   function To_String (Argument : in     Argument_Names) return String is
+      use Ada.Characters.Handling;
+   begin
+      return Argument_Marker & To_Lower (Argument_Names'Image (Argument));
+   end To_String;
 
    function Valid (Argument : Argument_Names) return Boolean is
-
---    subtype Valid_Field_Count_Range is Natural range
---      Minimum_Field_Count (Argument) .. Maximum_Field_Count (Argument);
-
-   begin --  Valid
+   begin
       if Set (Argument) then
          return
            Field_Count (Argument) in
@@ -288,38 +240,6 @@ package body Generic_Command_Line_Processing is
          return not Obligatory (Argument);
       end if;
    end Valid;
-
-   ---------------------------------------------------------------------------
-   --  function Set:
-   --
-   --  Checks if Argument has been passed to the program.
-   --
-   --  Exceptions:
-   --    None
-
-   function Set (Argument : Argument_Names) return Boolean is
-
-   begin --  Set
-      return Argument_Index (Argument) > 0;
-   end Set;
-
-   pragma Inline (Set);
-
-   ---------------------------------------------------------------------------
-   --  function Field_Count:
-   --
-   --  Returns the number of fields passed along with Argument.
-   --
-   --  Exceptions:
-   --    None
-
-   function Field_Count (Argument : Argument_Names) return Natural is
-
-   begin --  Field_Count
-      return Argument_Field_Count (Argument);
-   end Field_Count;
-
-   pragma Inline (Field_Count);
 
    ---------------------------------------------------------------------------
    --  function Value:

@@ -51,8 +51,8 @@ package Generic_Command_Line_Processing is
    ---------------------------------------------------------------------------
    --  Exceptions:
 
-   Argument_Error : exception; --  Raised in case of bad command line
-                               --  arguments.
+   Argument_Error : exception;
+   --  Raised in case of bad command line arguments.
 
    ---------------------------------------------------------------------------
    --  subtype Argument_Names:
