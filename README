@@ -1,0 +1,36 @@
+Old Command-Line packages [1]
+=============================
+
+This is my old set of command-line processing packages.  Please consider
+them almost obsolescent.  I am in the planning phase for a replacement,
+which is intended to intrude less on the sources of the actual
+application.
+
+
+Included tests
+--------------
+
+The repository comes with two ready-to-use test cases:
+
+1) 'cyclomatic_complexity' - reports excessive cyclomatic complexities in the
+   project sources.
+
+2) 'unused_units' - warns about units which aren't compiled.
+
+
+Links
+-----
+
+If you want to find free Ada tools or libraries AdaIC [2] is an excellent
+starting point.  You can also take a look at my other source text
+repositories [3] or my web site [4].
+
+[1] Source text repository:
+    https://bitbucket.org/sparre/old-command-line-packages
+[2] Free Ada Tools and Libraries:
+    http://www.adaic.org/ada-resources/tools-libraries/
+[3] My repositories on Bitbucket:
+    http://repositories.jacob-sparre.dk/
+[4] My web site:
+    http://www.jacob-sparre.dk/
+
