@@ -146,7 +146,8 @@ package body Generic_Command_Line_Processing is
             Put (File => File,
                  Item => " flag");
          elsif Minimum_Field_Count (Argument) =
-               Maximum_Field_Count (Argument) then
+               Maximum_Field_Count (Argument)
+         then
             Put (File => File,
                  Item => ", exactly ");
             Put (File  => File,
