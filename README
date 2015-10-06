@@ -1,21 +1,9 @@
 Old Command-Line packages [1]
 =============================
 
-This is my old set of command-line processing packages.  Please consider
-them almost obsolescent.  I am in the planning phase for a replacement,
-which is intended to intrude less on the sources of the actual
-application.
-
-
-Included tests
---------------
-
-Currently the repository only contains two rather general test cases:
-
-1) 'cyclomatic_complexity' - reports excessive cyclomatic complexities in the
-   project sources.
-
-2) 'unused_units' - warns about units which aren't compiled.
+This is my old set of command-line processing packages.  Please consider using
+my ASIS-based command-line driver generator
+(http://repositories.jacob-sparre.dk/command-line-parser-generator) instead.
 
 
 Links
