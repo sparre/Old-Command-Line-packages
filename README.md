@@ -15,10 +15,13 @@ repositories [3] or my web site [4].
 
 [1] Source text repository:
     https://bitbucket.org/sparre/old-command-line-packages
+
 [2] Free Ada Tools and Libraries:
     http://www.adaic.org/ada-resources/tools-libraries/
+
 [3] My repositories on Bitbucket:
     http://repositories.jacob-sparre.dk/
+
 [4] My web site:
     http://www.jacob-sparre.dk/
 
